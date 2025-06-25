@@ -1,0 +1,449 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; */
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    overflow: hidden;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    left: 30%;
+    width: 70%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.5rem;
+    background: #fff;
+}
+header h3 {
+    color: #0083c2;
+}
+header .btn-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.btn-area button {
+    outline: none;
+    border: none;
+}
+.btn-area button i {
+    font-size: 24px;
+    color: #0083c2;
+}
+
+pre {
+    position: absolute;
+    left: 30%;
+    width: 70%;
+    margin-top: 40px;
+    height: calc(100vh-40px);
+}
+
+/* Sidebar Styling */
+.sidebar {
+    position: fixed;
+    width: 30%;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    background: white;
+    overflow: hidden;
+    border-right: 2px solid #c8c8d0;
+    padding: 5px 0;
+    padding-bottom: 1.7rem;
+}
+.sidebar * {
+    user-select: none;
+}
+
+.sidebar .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.2rem 0.5rem;
+    border-bottom: 2px solid #c8c8d0;
+}
+.head .head-logo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+}
+.head-logo h3 {
+    font-family: Sans-Serif;
+    text-transform: uppercase;
+    color: #0083c2;
+    font-weight: 900;
+}
+.head-logo i {
+    color: #0083c2;
+    font-size: 19px;
+}
+.head .action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+.head .action button {
+    outline: none;
+    border: none;
+    width: 28px;
+    height: 28px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 50%;
+}
+.action button i {
+    font-size: 17px;
+    color: #0083c2;
+}
+/*--> Popup Alert Box <--*/
+.sidebar .popup-alert {
+    position: absolute;
+    width: 230px;
+    padding: 1rem 0.5rem;
+    /* height: 200px; */
+    background: #feffff;
+    left: 10%;
+    top: 25%;
+    right: 10%;
+    z-index: 9000000;
+    border-radius: 5px;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.popup-alert .close {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 50%;
+    background: #da1204;
+    cursor: pointer;
+}
+.popup-alert .close i {
+    color: #fff;
+    font-weight: 900;
+}
+.popup-alert .error-msg {
+    font-weight: 800;
+    line-height: 1.8rem;
+    color: #da1204;
+    text-align: center;
+}
+/*--> Popup Alert Box <--*/
+
+/*--> Context Menu <--*/
+.context-menu {
+    position: absolute;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    z-index: 100000;
+    width: 200px;
+    height: 50vh;
+    transform: scale(0);
+    transform-origin: top center;
+    transition: transform 0.1s ease;
+    z-index: 9000000 !important;
+    border: 0.1px solid #fff;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.context-menu.active {
+    transform: scale(1);
+}
+
+.menu-item {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-top: 0.1px solid transparent;
+    border-left: 0.1px solid transparent;
+    border-right: 0.1px solid transparent;
+    border-bottom: 0.1px solid #f0f0f0;
+    border-style: dashed;
+}
+
+.menu-item:last-child {
+    border-bottom: none;
+}
+
+.menu-item:hover {
+    background-color: #f5f9ff;
+}
+
+.menu-item i {
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
+    color: #3498db;
+}
+
+.menu-item.disabled {
+    color: #aaa;
+    pointer-events: none;
+}
+
+.menu-item.disabled i {
+    color: #aaa;
+}
+
+.menu-header {
+    padding: 8px 20px;
+    font-weight: bold;
+    color: #555;
+    font-size: 14px;
+    text-align: left;
+    border-radius: 8px 8px 0 0;
+    background-color: #f8f9fa;
+}
+
+/*--> Context Menu <--*/
+
+.tree-root {
+    padding: 0 0.5rem;
+}
+
+.tree-container {
+    height: 97%;
+    position: relative;
+    padding-left: -5px;
+    padding-top: 45px;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+.tree-container5 lii input {
+    margin: 0.7rem 0;
+    padding: 0.5rem;
+}
+
+.tree-node {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin-left: 5px;
+    margin-top: -30px;
+    width: 95%;
+}
+.tree-node #name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    width: 200px;
+}
+
+.tree-container > .tree-node:before,
+.tree-node:last-child:before {
+    display: none;
+}
+
+.tree-node > div {
+    display: flex;
+    align-items: center;
+    margin-top: 0;
+    margin-bottom: 40px;
+    padding: 6px 6px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    cursor: pointer;
+    user-select: none;
+    user-zoom: none;
+}
+.tree-node > input {
+    display: none;
+    width: 95%;
+    outline: none;
+    border: 1.5px solid #0083c2;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    margin-left: 2px;
+    margin-bottom: 0.5rem;
+}
+
+.tree-node > div:hover {
+    background-color: #f3f0ff;
+}
+
+.folder-toggle {
+    width: 20px;
+    height: 17px;
+    padding: 1.5px;
+    font-size: 13px;
+    color: #0020e9;
+    font-weight: 900;
+    font-family: Monospace;
+    border-radius: 3px;
+    background: linear-gradient(145deg, #ffffff, #e6e6e6);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    margin-right: 6px;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+    z-index: 5;
+}
+
+.tree-node .fa-folder {
+    font-size: 20px;
+    margin-right: 5px;
+    color: #0089a2;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.tree-node .fa-folder-open {
+    color: #1fcceb;
+    margin-right: 5px;
+    font-size: 20px;
+}
+
+.tree-node .fa-file {
+    font-size: 20px;
+    margin-right: 5px;
+    color: #90a4ae;
+}
+
+.tree-node .children {
+    display: none;
+    margin-left: 8px;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.tree-node.open > .children {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/*---> Mobile Devices Responsive <---*/
+@media (max-width: 768px) {
+    header,
+    pre {
+        width: 100%;
+        left: 0;
+    }
+    .sidebar {
+        width: 80%;
+        z-index: 900;
+        display: none;
+    }
+    .mobile-menu {
+        display: block;
+    }
+}
+
+/* Enabled Dark Theme UI */
+.dark-- {
+    background: #000;
+    color: #fff;
+}
+.dark-- header h3,
+.head-logo h3 {
+    color: #fff;
+}
+.dark-- .sidebar .head {
+    border-top: 0.1px solid transparent;
+    border-right: 0.1px solid transparent;
+    border-left: 0.1px solid transparent;
+    border-bottom: 0.1px solid #fff;
+    border-style: dashed;
+}
+.dark-- header,
+.dark-- aside {
+    background: #000;
+    color: #ffff;
+    border: 0.1px solid #fff;
+    border-style: dashed;
+}
+/*
+.dark-- header {
+    border-bottom: 0.1px solid transparent;
+}
+.dark-- #editor {
+    border-top: 0.1px solid transparent;
+}
+*/
+.dark-- .action button {
+    background: transparent;
+    border: 0.1px solid #fff;
+    border-style: dashed;
+}
+.dark-- .btn-area button {
+    background: transparent;
+}
+.dark-- .btn-area button i,
+.action button i {
+    color: #fff;
+}
+.dark-- .head-logo i {
+    color: #fff;
+}
+.dark-- .tree-node {
+    color: #fff;
+}
+.dark-- .tree-node > div:hover {
+    background: #032932;
+}
+.dark-- .tree-node input {
+    background: transparent;
+    color: #fff;
+}
+.dark-- .context-menu {
+    background: #000b0e;
+    border: 0.1px solid #fff;
+    border-style: dashed;
+}
+.dark-- .context-menu .menu-header {
+    background: #003240;
+    color: #fff;
+}
+.dark-- .menu-item {
+    color: #ffffff;
+}
+.dark-- .menu-item:hover {
+    background: #000000;
+}
+.dark-- .sidebar .popup-alert {
+    background: #011414;
+    border: 0.1px solid #fff;
+    border-style: dashed;
+}

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <title>Code Editor</title>
+
+        <link rel="stylesheet" href="fonts/css/all.min.css" />
+        <link
+            type="text/css"
+            media="screen"
+            rel="stylesheet"
+            href="styles/index.css"
+        />
+        <link
+            type="text/css"
+            media="screen"
+            rel="stylesheet"
+            href="styles/theme.css"
+        />
+        <link
+            type="text/css"
+            media="screen"
+            rel="stylesheet"
+            href="styles/editor5.css"
+        />
+        <script src="js/socket.io.min.js"></script>
+        <script type="text/javascript" src="ace/src-noconflict/ace.js"></script>
+        <script
+            type="text/javascript"
+            src="ace/src-noconflict/ext-language_tools.js"
+        ></script>
+        <script>
+            ace.config.set("basePath", "/ace/src-noconflict/");
+            ace.require("/ace/src/ext-language_tools.js");
+        </script>
+    </head>
+    <body class="dark--">
+        <header>
+            <h3><i class="fas fa-code"></i>Editor</h3>
+            <div class="btn-area">
+                <button id="menu-btn"><i class="fas fa-bars"></i></button>
+            </div>
+        </header>
+        <aside class="sidebar">
+            <div class="head">
+                <div class="head-logo">
+                    <i class="fas fa-folder-tree"></i>
+                    <h3>Explorer</h3>
+                </div>
+                <div class="action">
+                    <button class="setting">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="terminal">
+                        <i class="fas fa-terminal"></i>
+                    </button>
+                    <button class="create-folder">
+                        <i class="fas fa-folder-plus"></i>
+                    </button>
+                    <button class="create-file">
+                        <i class="fas fa-file-circle-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <ul id="tree-root" class="tree-container"></ul>
+            <div class="popup-alert">
+                <span class="close">
+                    <i class="fas fa-x"></i>
+                </span>
+                <p class="error-msg">
+                    Folder Already Exist In This Directory !
+                </p>
+            </div>
+            <div class="context-menu" id="contextMenu">
+                <!-- File operations -->
+                <div class="menu-header">File</div>
+                <div class="menu-item" data-action="new-folder">
+                    <i class="fas fa-folder-plus"></i>
+                    <span>New Folder</span>
+                </div>
+                <div class="menu-item" data-action="new-file">
+                    <i class="fas fa-file-circle-plus"></i>
+                    <span>New File</span>
+                </div>
+                <div class="menu-item" data-action="save">
+                    <i class="fas fa-save"></i>
+                    <span>Save All</span>
+                </div>
+
+                <!-- Edit operations -->
+                <div class="menu-header">Edit</div>
+                <div class="menu-item" data-action="new-file">
+                    <i class="fas fa-file"></i>
+                    <span>Rename</span>
+                </div>
+                <div class="menu-item" data-action="new-file">
+                    <i class="fas fa-file"></i>
+                    <span>Delete</span>
+                </div>
+                <div class="menu-item" data-action="copy">
+                    <i class="fas fa-copy"></i>
+                    <span>Copy</span>
+                </div>
+                <div class="menu-item" data-action="paste">
+                    <i class="fas fa-paste"></i>
+                    <span>Paste</span>
+                </div>
+                <div class="menu-item" data-action="cut">
+                    <i class="fas fa-cut"></i>
+                    <span>Cut</span>
+                </div>
+            </div>
+        </aside>
+
+        <pre id="editor">
+function foo(items){
+    var i;
+    for (i = 0; i &lt; items.length; i++){
+        alert("Ace Rocks " + items[i]);
+    }
+}</pre
+        >
+
+        <script src="js/editor.js"></script>
+        <script type="module" src="js/ui.js"></script>
+    </body>
+</html>
+
+<!--
+<div class="ace_layer ace_cursor-layer ace_hidden-cursors"><div class="ace_cursor" style="display: block; transform: translate(4px, 315px); width: 11px; height: 35px; animation-duration: 1000ms;"></div></div>
+<div class="ace_layer ace_marker-layer"></div>
+<span tabindex="-1" class="ace_gutter_annotation" aria-label="Info, read annotations row 2" role="button" style="display: block; height: 35px;"><span class="ace_icon" style="height: 35px;"></span></span>
+
+
+-->

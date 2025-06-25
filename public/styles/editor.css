@@ -1,0 +1,148 @@
+/* Main editor container */
+#editor {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    letter-spacing: 1px; /* Requested letter-spacing */
+    white-space: pre; /* Prevent text wrapping */
+    background: linear-gradient(135deg, #ffffff 0%, #f9f9fb 100%); /* Subtle gradient background */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.1); /* Neumorphic shadow */
+    transition: all 0.3s ease; /* Smooth transitions */
+}
+
+/* Editor content area */
+#editor .ace_content {
+    letter-spacing: 1px; /* Ensure consistent letter-spacing */
+    padding: 10px 20px 10px 10px; /* Extra right padding to prevent cutoff */
+    transition: transform 0.2s ease; /* Smooth content shift on interaction */
+}
+
+/* Gutter (line numbers) styling */
+#editor .ace_gutter {
+    background: linear-gradient(to right, #f0f2f5 0%, #e8eaed 100%); /* Gradient gutter */
+    color: #4a5568; /* Dark gray line numbers */
+    border-right: 1px solid #d1d5db; /* Subtle border */
+    width: 50px !important; /* Wider gutter for readability */
+    transition: background 0.3s ease;
+}
+#editor .ace_gutter-cell {
+    padding-left: 15px !important; /* Align numbers */
+    font-weight: 500; /* Bolder numbers */
+}
+#editor .ace_gutter-active-line {
+    background: #dbeafe !important; /* Blue highlight for active line */
+    color: #1e40af !important; /* Darker blue number */
+}
+
+/* Active line highlight */
+#editor .ace_active-line {
+    background: rgba(59, 130, 246, 0.1); /* Soft blue highlight */
+    border-left: 3px solid #3b82f6; /* Blue accent border */
+    transition: background 0.2s ease;
+}
+
+/* Cursor styling with animation */
+#editor .ace_cursor {
+    border-left: 2px solid #2563eb; /* Vibrant blue cursor */
+    animation: blink 0.8s step-end infinite; /* Blinking effect */
+}
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+/* Selection styling */
+#editor .ace_selection {
+    background: rgba(59, 130, 246, 0.3); /* Semi-transparent blue selection */
+    border-radius: 2px; /* Slightly rounded selection */
+}
+
+/* Scrollbars */
+#editor .ace_scrollbar-h, #editor .ace_scrollbar-v {
+    scrollbar-width: thin; /* Thin scrollbar for Firefox */
+    scrollbar-color: #60a5fa #e5e7eb; /* Blue thumb, gray track */
+}
+#editor .ace_scrollbar-h {
+    overflow-x: auto !important; /* Force horizontal scrollbar */
+    padding-bottom: 2px; /* Prevent overlap */
+}
+#editor .ace_scrollbar-v::-webkit-scrollbar, #editor .ace_scrollbar-h::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+#editor .ace_scrollbar-v::-webkit-scrollbar-thumb, #editor .ace_scrollbar-h::-webkit-scrollbar-thumb {
+    background: #60a5fa; /* Blue thumb */
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+#editor .ace_scrollbar-v::-webkit-scrollbar-thumb:hover, #editor .ace_scrollbar-h::-webkit-scrollbar-thumb:hover {
+    background: #3b82f6; /* Darker blue on hover */
+}
+#editor .ace_scrollbar-v::-webkit-scrollbar-track, #editor .ace_scrollbar-h::-webkit-scrollbar-track {
+    background: #e5e7eb; /* Light gray track */
+}
+
+/* Fold widgets (code folding) */
+#editor .ace_fold-widget {
+    background: #9ca3af; /* Gray widget */
+    color: #ffffff; /* White icon */
+    border-radius: 3px;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+#editor .ace_fold-widget:hover {
+    background: #3b82f6; /* Blue on hover */
+    transform: scale(1.1); /* Slight zoom effect */
+}
+
+/* Annotations (errors/warnings) */
+#editor .ace_error, #editor .ace_warning {
+    position: relative;
+    background-image: none !important; /* Remove default underline */
+}
+#editor .ace_error::after, #editor .ace_warning::after {
+    content: attr(title); /* Use annotation title as tooltip content */
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1f2937; /* Dark tooltip background */
+    color: #ffffff; /* White text */
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+#editor .ace_error:hover::after, #editor .ace_warning:hover::after {
+    opacity: 1; /* Show tooltip on hover */
+}
+
+/* Syntax highlighting overrides (example for Monokai theme compatibility) */
+#editor .ace_keyword {
+    color: #7c3aed !important; /* Vibrant purple keywords */
+    font-weight: 600;
+}
+#editor .ace_string {
+    color: #10b981 !important; /* Emerald green strings */
+}
+#editor .ace_comment {
+    color: #6b7280 !important; /* Gray comments */
+    font-style: italic;
+}
+
+/* Marker layers (e.g., search results) */
+#editor .ace_marker-layer .ace_selected-word {
+    background: rgba(234, 179, 8, 0.2); /* Yellow highlight for selected word */
+    border: 1px solid #eab308;
+    border-radius: 2px;
+}
+
+/* Smooth scrolling behavior */
+#editor .ace_scroller {
+    scroll-behavior: smooth; /* Smooth scrolling */
+    overscroll-behavior-x: contain; /* Prevent parent scrolling interference */
+}

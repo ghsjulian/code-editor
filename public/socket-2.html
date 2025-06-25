@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permanent WebSocket Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        #status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+            background-color: #f44336;
+            color: white;
+        }
+        
+        #status.connected {
+            background-color: #4CAF50;
+        }
+        
+        #messages {
+            height: 300px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            overflow-y: auto;
+            background-color: white;
+            border-radius: 5px;
+        }
+        
+        #form {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        button:disabled {
+            background-color: #9E9E9E;
+            cursor: not-allowed;
+        }
+        
+        .message {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 4px;
+            background-color: #E3F2FD;
+        }
+        
+        .timestamp {
+            font-size: 0.8em;
+            color: #757575;
+            margin-top: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Permanent WebSocket Connection</h1>
+    <div id="status">Disconnected</div>
+    
+    <div id="messages"></div>
+    
+    <div id="form">
+        <input type="text" id="input" placeholder="Type your message..." disabled>
+        <button id="send" disabled>Send</button>
+    </div>
+
+    <script>
+        // Configuration
+        const WS_URL = 'ws://localhost:9000';
+        const HEARTBEAT_INTERVAL = 25000; // 25 seconds (less than server's 30s)
+        
+        // DOM Elements
+        const statusEl = document.getElementById('status');
+        const messagesEl = document.getElementById('messages');
+        const inputEl = document.getElementById('input');
+        const sendBtn = document.getElementById('send');
+        
+        // State
+        let socket = null;
+        let heartbeatTimer = null;
+        let lastActivity = Date.now();
+        
+        // Initialize WebSocket connection (only once)
+        function connect() {
+            // Close existing connection if any
+            if (socket) {
+                socket.close();
+            }
+            
+            socket = new WebSocket(WS_URL);
+            
+            // Connection opened
+            socket.onopen = (event) => {
+                statusEl.textContent = 'CONNECTED';
+                statusEl.className = 'connected';
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                logMessage('System: Connection established with server');
+                
+                // Start heartbeat
+                startHeartbeat();
+            };
+            
+            // Message received
+            socket.onmessage = (event) => {
+                lastActivity = Date.now();
+                logMessage('Server: ' + event.data);
+                
+                // If server sends pong, reset heartbeat
+                if (event.data === 'pong') {
+                    return;
+                }
+            };
+            
+            // Connection closed
+            socket.onclose = (event) => {
+                statusEl.textContent = 'DISCONNECTED';
+                statusEl.className = '';
+                inputEl.disabled = true;
+                sendBtn.disabled = true;
+                logMessage('System: Connection lost');
+                
+                // Stop heartbeat
+                stopHeartbeat();
+            };
+            
+            // Connection error
+            socket.onerror = (error) => {
+                logMessage('System: Connection error');
+            };
+        }
+        
+        // Heartbeat mechanism to keep connection alive
+        function startHeartbeat() {
+            heartbeatTimer = setInterval(() => {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send('ping');
+                    logMessage('System: Sent ping to server');
+                }
+            }, HEARTBEAT_INTERVAL);
+        }
+        
+        function stopHeartbeat() {
+            if (heartbeatTimer) {
+                clearInterval(heartbeatTimer);
+                heartbeatTimer = null;
+            }
+        }
+        
+        // Log messages to UI
+        function logMessage(text) {
+            const msgEl = document.createElement('div');
+            msgEl.className = 'message';
+            msgEl.innerHTML = `
+                <div>${text}</div>
+                <div class="timestamp">${new Date().toLocaleTimeString()}</div>
+            `;
+            messagesEl.appendChild(msgEl);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+        
+        // Event listeners
+        sendBtn.addEventListener('click', () => {
+            if (socket && socket.readyState === WebSocket.OPEN && inputEl.value.trim()) {
+                const message = inputEl.value;
+                socket.send(message);
+                logMessage('You: ' + message);
+                inputEl.value = '';
+            }
+        });
+        
+        inputEl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendBtn.click();
+            }
+        });
+        
+        // Initial connection (only once)
+        connect();
+        
+        // Never attempt to reconnect automatically
+        // The connection will stay dead if it fails
+        // This is intentional for a permanent connection
+    </script>
+</body>
+</html>
