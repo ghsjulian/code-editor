@@ -25,7 +25,6 @@
             rel="stylesheet"
             href="styles/editor5.css"
         />
-        <script src="js/socket.io.min.js"></script>
         <script type="text/javascript" src="ace/src-noconflict/ace.js"></script>
         <script
             type="text/javascript"
@@ -40,7 +39,19 @@
         <header>
             <h3><i class="fas fa-code"></i>Editor</h3>
             <div class="btn-area">
+                <button id="run-btn"><i class="fas fa-play"></i></button>
                 <button id="menu-btn"><i class="fas fa-bars"></i></button>
+            </div>
+            <div class="tab-bar">
+                <!--
+                <p>
+                    <span><i class="fas fa-file"></i>index.php</span
+                    ><i  class="fa fa-x"></i>
+                </p>
+                <p><span>index.html</span> <i class="fa fa-x"></i></p>
+                <p><span>index.html</span> <i class="fa fa-x"></i></p>
+                <p><span>index.html</span> <i class="fa fa-x"></i></p>
+                -->
             </div>
         </header>
         <aside class="sidebar">
@@ -53,7 +64,7 @@
                     <button class="setting">
                         <i class="fas fa-cog"></i>
                     </button>
-                    <button class="terminal">
+                    <button id="terminal-btn" class="terminal">
                         <i class="fas fa-terminal"></i>
                     </button>
                     <button class="create-folder">
@@ -65,6 +76,19 @@
                 </div>
             </div>
             <ul id="tree-root" class="tree-container"></ul>
+            <div class="new-project">
+                <p>No project yet !</p>
+                <p>
+                    Start building a new project or select a existing project
+                    from your machine !
+                </p>
+                <button id="new-project">Create New</button>
+                <input
+                    type="text"
+                    enterkeyhint="go"
+                    placeholder="Enter project name"
+                />
+            </div>
             <div class="popup-alert">
                 <span class="close">
                     <i class="fas fa-x"></i>
@@ -84,18 +108,18 @@
                     <i class="fas fa-file-circle-plus"></i>
                     <span>New File</span>
                 </div>
-                <div class="menu-item" data-action="save">
+                <div class="menu-item" data-action="save-all">
                     <i class="fas fa-save"></i>
                     <span>Save All</span>
                 </div>
 
                 <!-- Edit operations -->
                 <div class="menu-header">Edit</div>
-                <div class="menu-item" data-action="new-file">
+                <div class="menu-item" data-action="rename">
                     <i class="fas fa-file"></i>
                     <span>Rename</span>
                 </div>
-                <div class="menu-item" data-action="new-file">
+                <div class="menu-item" data-action="delete">
                     <i class="fas fa-file"></i>
                     <span>Delete</span>
                 </div>
@@ -113,6 +137,25 @@
                 </div>
             </div>
         </aside>
+        <div id="terminal" class="terminal-window">
+            <div class="output">
+                Welcome to Kali Linux !!<br />Created By -
+                <strong>Ghs Julian</strong>
+            </div>
+            <div class="prompt-line">
+                <span class="user">root</span><span>@</span>
+                <span class="host">kali</span><span>:</span>
+                <span class="path">~</span><span class="symbol">#</span>
+                <div id="input-container">
+                    <input
+                        enterkeyhint="go"
+                        id="terminal-input"
+                        type="text"
+                        autofocus
+                    />
+                </div>
+            </div>
+        </div>
 
         <pre id="editor">
 function foo(items){
@@ -123,15 +166,13 @@ function foo(items){
 }</pre
         >
 
-        <script src="js/editor.js"></script>
+        <div class="pre-loader">
+            <i class="fas fa-code"></i>
+            <h3>Editor Initializing<span class="dot"></span></h3>
+        </div>
+
+        <script src="js/socket.io.min.js"></script>
         <script type="module" src="js/ui.js"></script>
+        <script type="module" src="js/terminal.js"></script>
     </body>
 </html>
-
-<!--
-<div class="ace_layer ace_cursor-layer ace_hidden-cursors"><div class="ace_cursor" style="display: block; transform: translate(4px, 315px); width: 11px; height: 35px; animation-duration: 1000ms;"></div></div>
-<div class="ace_layer ace_marker-layer"></div>
-<span tabindex="-1" class="ace_gutter_annotation" aria-label="Info, read annotations row 2" role="button" style="display: block; height: 35px;"><span class="ace_icon" style="height: 35px;"></span></span>
-
-
--->

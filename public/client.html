@@ -1,343 +1,126 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Client</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        
-        #connection-status {
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-        
-        .connected {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        
-        .disconnected {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        
-        #message-container {
-            height: 300px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
-            overflow-y: auto;
-            background-color: white;
-            border-radius: 5px;
-        }
-        
-        #message-form {
-            display: flex;
-            gap: 10px;
-        }
-        
-        #message-input {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        
-        button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        
-        button:hover {
-            background-color: #0056b3;
-        }
-        
-        .message {
-            margin-bottom: 10px;
-            padding: 8px;
-            border-radius: 4px;
-        }
-        
-        .received {
-            background-color: #e9ecef;
-        }
-        
-        .sent {
-            background-color: #d1ecf1;
-            margin-left: 20%;
-        }
-        
-        .system {
-            background-color: #fff3cd;
-            text-align: center;
-            font-style: italic;
-        }
-        
-        .timestamp {
-            font-size: 0.8em;
-            color: #6c757d;
-            margin-top: 2px;
-        }
-        
-        #reconnect-btn {
-            background-color: #6c757d;
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <h1>WebSocket Client</h1>
-    <div id="connection-status" class="disconnected">Disconnected</div>
-    
-    <div id="message-container"></div>
-    
-    <div id="message-form">
-        <input type="text" id="message-input" placeholder="Type your message..." disabled>
-        <button type="submit" id="send-btn" disabled>Send</button>
-        <button type="button" id="reconnect-btn">Reconnect</button>
-    </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>WebSocket Client</title>
+        <style>
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f5f5f5;
+            }
 
-    <script>
-        // Configuration
-        const WS_SERVER_URL = 'ws://localhost:9000';
-        const RECONNECT_INTERVAL = 5000; // 5 seconds
-        const PING_INTERVAL = 25000; // 25 seconds (less than server's 30s)
-        
-        // DOM Elements
-        const connectionStatus = document.getElementById('connection-status');
-        const messageContainer = document.getElementById('message-container');
-        const messageInput = document.getElementById('message-input');
-        const sendBtn = document.getElementById('send-btn');
-        const reconnectBtn = document.getElementById('reconnect-btn');
-        
-        // State
-        let socket = null;
-        let reconnectAttempts = 0;
-        let pingIntervalId = null;
-        let isActiveConnection = true;
-        
-        // Initialize WebSocket connection
-        function connectWebSocket() {
-            // Close existing connection if any
-            if (socket) {
-                socket.close();
+            #connection-status {
+                padding: 10px;
+                border-radius: 5px;
+                margin-bottom: 20px;
+                font-weight: bold;
             }
-            
-            socket = new WebSocket(WS_SERVER_URL);
-            
-            // Connection opened
-            socket.addEventListener('open', (event) => {
-                updateConnectionStatus(true);
-                reconnectAttempts = 0;
-                addSystemMessage('Connected to server');
-                
-                // Enable input and button
-                messageInput.disabled = false;
-                sendBtn.disabled = false;
-                reconnectBtn.style.display = 'none';
-                
-                // Start ping interval
-                startPingInterval();
-            });
-            
-            // Listen for messages
-            socket.addEventListener('message', (event) => {
-                try {
-                    const message = JSON.parse(event.data);
-                    addReceivedMessage(message);
-                } catch (e) {
-                    // If not JSON, treat as plain text
-                    addReceivedMessage(event.data);
-                }
-            });
-            
-            // Connection closed
-            socket.addEventListener('close', (event) => {
-                updateConnectionStatus(false);
-                addSystemMessage(`Disconnected: ${getCloseReason(event.code)}`);
-                
-                // Disable input and button
-                messageInput.disabled = true;
-                sendBtn.disabled = true;
-                
-                // Stop pinging
-                stopPingInterval();
-                
-                // Show reconnect button if connection was active
-                if (isActiveConnection) {
-                    reconnectBtn.style.display = 'inline-block';
-                }
-                
-                // Attempt to reconnect automatically (with exponential backoff)
-                if (isActiveConnection) {
-                    const delay = Math.min(RECONNECT_INTERVAL * Math.pow(2, reconnectAttempts), 30000);
-                    setTimeout(connectWebSocket, delay);
-                    reconnectAttempts++;
-                }
-            });
-            
-            // Connection error
-            socket.addEventListener('error', (event) => {
-                console.error('WebSocket error:', event);
-                addSystemMessage('Connection error occurred');
-            });
-        }
-        
-        // Helper function to update connection status UI
-        function updateConnectionStatus(isConnected) {
-            if (isConnected) {
-                connectionStatus.textContent = 'Connected';
-                connectionStatus.className = 'connected';
-            } else {
-                connectionStatus.textContent = 'Disconnected';
-                connectionStatus.className = 'disconnected';
+
+            .connected {
+                background-color: #d4edda;
+                color: #155724;
             }
-        }
-        
-        // Helper function to add system messages to the UI
-        function addSystemMessage(text) {
-            const messageElement = document.createElement('div');
-            messageElement.className = 'message system';
-            messageElement.innerHTML = `
-                <div>${text}</div>
-                <div class="timestamp">${formatTimestamp()}</div>
-            `;
-            messageContainer.appendChild(messageElement);
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-        }
-        
-        // Helper function to add received messages to the UI
-        function addReceivedMessage(message) {
-            const messageElement = document.createElement('div');
-            messageElement.className = 'message received';
-            
-            if (typeof message === 'object') {
-                messageElement.innerHTML = `
-                    <div><strong>Received:</strong> ${JSON.stringify(message, null, 2)}</div>
-                    <div class="timestamp">${formatTimestamp()}</div>
-                `;
-            } else {
-                messageElement.innerHTML = `
-                    <div><strong>Received:</strong> ${message}</div>
-                    <div class="timestamp">${formatTimestamp()}</div>
-                `;
+
+            .disconnected {
+                background-color: #f8d7da;
+                color: #721c24;
             }
-            
-            messageContainer.appendChild(messageElement);
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-        }
-        
-        // Helper function to add sent messages to the UI
-        function addSentMessage(message) {
-            const messageElement = document.createElement('div');
-            messageElement.className = 'message sent';
-            messageElement.innerHTML = `
-                <div><strong>You:</strong> ${message}</div>
-                <div class="timestamp">${formatTimestamp()}</div>
-            `;
-            messageContainer.appendChild(messageElement);
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-        }
-        
-        // Helper function to format timestamps
-        function formatTimestamp() {
-            return new Date().toLocaleTimeString();
-        }
-        
-        // Helper function to get WebSocket close reason
-        function getCloseReason(code) {
-            const reasons = {
-                1000: 'Normal closure',
-                1001: 'Server is going away',
-                1002: 'Protocol error',
-                1003: 'Unsupported data',
-                1005: 'No status received',
-                1006: 'Abnormal closure',
-                1007: 'Invalid frame payload data',
-                1008: 'Policy violation',
-                1009: 'Message too big',
-                1010: 'Missing extension',
-                1011: 'Internal server error',
-                1012: 'Service restart',
-                1013: 'Try again later',
-                1014: 'Bad gateway',
-                1015: 'TLS handshake failed'
-            };
-            return reasons[code] || `Unknown reason (code ${code})`;
-        }
-        
-        // Start sending pings to keep connection alive
-        function startPingInterval() {
-            if (pingIntervalId) {
-                clearInterval(pingIntervalId);
+
+            #message-container {
+                height: 300px;
+                border: 1px solid #ddd;
+                padding: 10px;
+                margin-bottom: 10px;
+                overflow-y: auto;
+                background-color: white;
+                border-radius: 5px;
             }
-            pingIntervalId = setInterval(() => {
-                if (socket && socket.readyState === WebSocket.OPEN) {
-                    socket.send(JSON.stringify({ type: 'ping', timestamp: Date.now() }));
-                }
-            }, PING_INTERVAL);
-        }
-        
-        // Stop pinging
-        function stopPingInterval() {
-            if (pingIntervalId) {
-                clearInterval(pingIntervalId);
-                pingIntervalId = null;
+
+            #message-form {
+                display: flex;
+                gap: 10px;
             }
-        }
-        
-        // Event listeners
-        sendBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (socket.readyState === WebSocket.OPEN && messageInput.value.trim()) {
-                const message = messageInput.value;
-                socket.send(message);
-                addSentMessage(message);
-                messageInput.value = '';
+
+            #message-input {
+                flex-grow: 1;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
             }
-        });
-        
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendBtn.click();
+
+            button {
+                padding: 10px 20px;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
             }
-        });
-        
-        reconnectBtn.addEventListener('click', () => {
-            addSystemMessage('Attempting to reconnect...');
-            isActiveConnection = true;
-            connectWebSocket();
-        });
-        
-        // Handle visibility changes to minimize unnecessary reconnections
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden') {
-                isActiveConnection = false;
-                if (socket) socket.close();
-            } else {
-                isActiveConnection = true;
-                if (!socket || socket.readyState !== WebSocket.OPEN) {
-                    connectWebSocket();
-                }
+
+            button:hover {
+                background-color: #0056b3;
             }
-        });
-        
-        // Initial connection
-        connectWebSocket();
-    </script>
-</body>
+
+            .message {
+                margin-bottom: 10px;
+                padding: 8px;
+                border-radius: 4px;
+            }
+
+            .received {
+                background-color: #e9ecef;
+            }
+
+            .sent {
+                background-color: #d1ecf1;
+                margin-left: 20%;
+            }
+
+            .system {
+                background-color: #fff3cd;
+                text-align: center;
+                font-style: italic;
+            }
+
+            .timestamp {
+                font-size: 0.8em;
+                color: #6c757d;
+                margin-top: 2px;
+            }
+
+            #reconnect-btn {
+                background-color: #6c757d;
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>WebSocket Client</h1>
+        <div id="connection-status" class="disconnected">Disconnected</div>
+
+        <div id="message-container"></div>
+
+        <div id="message-form">
+            <input
+                type="text"
+                id="message-input"
+                placeholder="Type your message..."
+                disabled
+            />
+            <button type="submit" id="send-btn" disabled>Send</button>
+            <button type="button" id="reconnect-btn">Reconnect</button>
+        </div>
+        <script>
+            let str =
+                "/data/data/com.termux/files/home/code/public/ace/ace.d.ts";
+            let trimPath = str.split("/");
+            trimPath[trimPath.length - 1] = "ghs.png";
+            let newPath = trimPath.toString().replaceAll(",","/")
+            console.log(newPath);
+        </script>
+    </body>
 </html>

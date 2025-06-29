@@ -1,15 +1,27 @@
 /* Main editor container */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: none;
+}
 #editor {
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    letter-spacing: 1px; /* Requested letter-spacing */
-    white-space: pre; /* Prevent text wrapping */
-    background: linear-gradient(135deg, #ffffff 0%, #f9f9fb 100%); /* Subtle gradient background */
+    box-sizing: none;
+    /* letter-spacing: 1px;  */ /* Requested letter-spacing */
+    /* white-space: pre; */ /* Prevent text wrapping */
+    background: linear-gradient(
+        135deg,
+        #ffffff 0%,
+        #f9f9fb 100%
+    ); /* Subtle gradient background */
     border-radius: 8px; /* Rounded corners */
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.1); /* Neumorphic shadow */
+    box-shadow:
+        inset 0 2px 8px rgba(0, 0, 0, 0.05),
+        0 4px 12px rgba(0, 0, 0, 0.1); /* Neumorphic shadow */
     transition: all 0.3s ease; /* Smooth transitions */
 }
 
@@ -22,7 +34,11 @@
 
 /* Gutter (line numbers) styling */
 #editor .ace_gutter {
-    background: linear-gradient(to right, #f0f2f5 0%, #e8eaed 100%); /* Gradient gutter */
+    background: linear-gradient(
+        to right,
+        #f0f2f5 0%,
+        #e8eaed 100%
+    ); /* Gradient gutter */
     color: #4a5568; /* Dark gray line numbers */
     border-right: 1px solid #d1d5db; /* Subtle border */
     width: 50px !important; /* Wider gutter for readability */
@@ -50,7 +66,9 @@
     animation: blink 0.8s step-end infinite; /* Blinking effect */
 }
 @keyframes blink {
-    50% { opacity: 0; }
+    50% {
+        opacity: 0;
+    }
 }
 
 /* Selection styling */
@@ -60,7 +78,8 @@
 }
 
 /* Scrollbars */
-#editor .ace_scrollbar-h, #editor .ace_scrollbar-v {
+#editor .ace_scrollbar-h,
+#editor .ace_scrollbar-v {
     scrollbar-width: thin; /* Thin scrollbar for Firefox */
     scrollbar-color: #60a5fa #e5e7eb; /* Blue thumb, gray track */
 }
@@ -68,19 +87,23 @@
     overflow-x: auto !important; /* Force horizontal scrollbar */
     padding-bottom: 2px; /* Prevent overlap */
 }
-#editor .ace_scrollbar-v::-webkit-scrollbar, #editor .ace_scrollbar-h::-webkit-scrollbar {
+#editor .ace_scrollbar-v::-webkit-scrollbar,
+#editor .ace_scrollbar-h::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
-#editor .ace_scrollbar-v::-webkit-scrollbar-thumb, #editor .ace_scrollbar-h::-webkit-scrollbar-thumb {
+#editor .ace_scrollbar-v::-webkit-scrollbar-thumb,
+#editor .ace_scrollbar-h::-webkit-scrollbar-thumb {
     background: #60a5fa; /* Blue thumb */
     border-radius: 4px;
     transition: background 0.3s ease;
 }
-#editor .ace_scrollbar-v::-webkit-scrollbar-thumb:hover, #editor .ace_scrollbar-h::-webkit-scrollbar-thumb:hover {
+#editor .ace_scrollbar-v::-webkit-scrollbar-thumb:hover,
+#editor .ace_scrollbar-h::-webkit-scrollbar-thumb:hover {
     background: #3b82f6; /* Darker blue on hover */
 }
-#editor .ace_scrollbar-v::-webkit-scrollbar-track, #editor .ace_scrollbar-h::-webkit-scrollbar-track {
+#editor .ace_scrollbar-v::-webkit-scrollbar-track,
+#editor .ace_scrollbar-h::-webkit-scrollbar-track {
     background: #e5e7eb; /* Light gray track */
 }
 
@@ -89,7 +112,9 @@
     background: #9ca3af; /* Gray widget */
     color: #ffffff; /* White icon */
     border-radius: 3px;
-    transition: background 0.2s ease, transform 0.2s ease;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
 }
 #editor .ace_fold-widget:hover {
     background: #3b82f6; /* Blue on hover */
@@ -97,11 +122,13 @@
 }
 
 /* Annotations (errors/warnings) */
-#editor .ace_error, #editor .ace_warning {
+#editor .ace_error,
+#editor .ace_warning {
     position: relative;
     background-image: none !important; /* Remove default underline */
 }
-#editor .ace_error::after, #editor .ace_warning::after {
+#editor .ace_error::after,
+#editor .ace_warning::after {
     content: attr(title); /* Use annotation title as tooltip content */
     position: absolute;
     top: -30px;
@@ -117,7 +144,8 @@
     transition: opacity 0.3s ease;
     z-index: 1000;
 }
-#editor .ace_error:hover::after, #editor .ace_warning:hover::after {
+#editor .ace_error:hover::after,
+#editor .ace_warning:hover::after {
     opacity: 1; /* Show tooltip on hover */
 }
 
