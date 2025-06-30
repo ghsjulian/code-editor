@@ -1,4 +1,3 @@
-import folderStructure from "./files-tree.js";
 import { socket, currentClientId } from "./client.js";
 import editor from "./editor.js";
 
@@ -30,12 +29,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Tab bar functionalities
 
     // Function to create a file tab
-    const createFileTab = (fileName, fileType) => {
+    const createFileTab = (fileName, fileType, path) => {
         if (openedFiles.has(fileName)) return;
         openedFiles.add(fileName);
 
         const tab = document.createElement("p");
         tab.dataset.file = fileName;
+        tab.dataset.path = path;
 
         // Set icon based on file type
         let iconClass = "";
@@ -83,9 +83,9 @@ document.addEventListener("DOMContentLoaded", () => {
         // Add click functionality
         tab.addEventListener("click", () => {
             setActiveTab(tab);
-            loadFileContent(fileName, fileType);
+            loadFileContent(fileName, fileType, path);
         });
-        loadFileContent(fileName, fileType);
+        loadFileContent(fileName, fileType, path);
         return tab;
     };
 
@@ -109,33 +109,45 @@ document.addEventListener("DOMContentLoaded", () => {
             let lastFile = openFiles[openFiles.length - 1].split(".");
             let ftype = lastFile[lastFile.length - 1];
             let fname = openFiles[openFiles.length - 1];
-            loadFileContent(fname, ftype);
+            loadFileContent(fname, ftype,lastElement.getAttribute("path"));
             setActiveTab(lastElement);
         }
     };
     // Function to load file content (mock implementation)
-    function loadFileContent(fileName, fileType) {
-        let content = "";
+    function loadFileContent(fileName, fileType, path) {
+        var content = "";
         let mode = "";
+
+        // TODO: socket implements here...
+        let project = localStorage.getItem("project-name");
+        let trimfpath = path.split("/");
+        let newPath;
+        for (let i = 0; i < trimfpath.length; i++) {
+            if (trimfpath[i] === project) {
+                newPath = trimfpath.slice(i, trimfpath.length).toString();
+            }
+        }
+        let strpath = newPath.replaceAll(",", "/");
+        socket.emit("get-file-content", strpath);
+        socket.on("read-file-content", data => {
+            console.log(data);
+            editor.session.setMode(mode);
+            editor.setValue(data);
+            editor.clearSelection();
+            editor.resize();
+        });
 
         switch (fileType) {
             case "html":
-                content = `<!DOCTYPE html>\n<html>\n<head>\n\t<title>${fileName}</title>\n</head>\n<body>\n\t<h1>${fileName}</h1>\n</body>\n</html>`;
                 mode = "ace/mode/html";
                 break;
             case "css":
-                content = `/* ${fileName} */\nbody {\n\tmargin: 0;\n\tpadding: 0;\n\tfont-family: Arial, sans-serif;\n}`;
                 mode = "ace/mode/css";
                 break;
             case "js":
-                content = `// ${fileName}\n\nfunction init() {\n\tconsole.log('Hello from ${fileName}');\n}\n\ninit();`;
                 mode = "ace/mode/javascript";
                 break;
             case "json":
-                content = `{\n\t"name": "${fileName.replace(
-                    ".json",
-                    ""
-                )}",\n\t"version": "1.0.0"\n}`;
                 mode = "ace/mode/json";
                 break;
             case "jpg":
@@ -146,11 +158,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 content = `// Unknown file type`;
                 mode = "ace/mode/text";
         }
-
-        editor.session.setMode(mode);
-        editor.setValue(content);
-        editor.clearSelection();
-        editor.resize();
     }
 
     const isExist = (currentFolder, name, type, callback) => {
@@ -475,7 +482,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         let oldpathName = newPath.replaceAll(",", "/");
         // TODO : Socket will be call here...
-        socket.emit("delete", {path:oldpathName,type:selectedItem.type});
+        socket.emit("delete", { path: oldpathName, type: selectedItem.type });
         selectedItem.li.remove();
     };
 
@@ -551,7 +558,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     let fileName = item.name;
                     let fileType = item.name.split(".");
                     let type = fileType[fileType.length - 1];
-                    createFileTab(fileName, type);
+                    createFileTab(fileName, type, item.path);
+                    document
+                        .querySelector(".sidebar")
+                        .classList.remove("mobile-menu");
                 });
             }
             // Opening Menu
@@ -600,16 +610,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector(".error-msg").textContent = "";
     };
 
-    const treeRoot = document.getElementById("tree-root");
-    socket.on("folder-structure", async data => {
-        if (await data) {
-            const folders = JSON.parse(data);
-            generateTree([folders], treeRoot);
-            tree = [folders];
-            console.log(folders);
-            document.querySelector(".pre-loader").style.display = "none";
-        }
-    });
     // generateTree(folderStructure, treeRoot);
     /*
     editor.setOption("fontFamily", "fira-code");
@@ -620,4 +620,14 @@ document.addEventListener("DOMContentLoaded", () => {
         editor.renderer.updateFull(); // Force full re-render
     }, 50);
     */
+
+    const treeRoot = document.getElementById("tree-root");
+    socket.on("folder-structure", async data => {
+        if (await data) {
+            const folders = JSON.parse(data);
+            generateTree([folders], treeRoot);
+            tree = [folders];
+            document.querySelector(".pre-loader").style.display = "none";
+        }
+    });
 });

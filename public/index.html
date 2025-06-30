@@ -25,15 +25,8 @@
             rel="stylesheet"
             href="styles/editor5.css"
         />
-        <script type="text/javascript" src="ace/src-noconflict/ace.js"></script>
-        <script
-            type="text/javascript"
-            src="ace/src-noconflict/ext-language_tools.js"
-        ></script>
-        <script>
-            ace.config.set("basePath", "/ace/src-noconflict/");
-            ace.require("/ace/src/ext-language_tools.js");
-        </script>
+
+  
     </head>
     <body class="dark--">
         <header>
@@ -170,7 +163,15 @@ function foo(items){
             <i class="fas fa-code"></i>
             <h3>Editor Initializing<span class="dot"></span></h3>
         </div>
-
+      <script type="text/javascript" src="ace/src-noconflict/ace.js"></script>
+        <script
+            type="text/javascript"
+            src="ace/src-noconflict/ext-language_tools.js"
+        ></script>
+        <script>
+            ace.config.set("basePath", "/ace/src-noconflict/");
+            ace.require("/ace/src/ext-language_tools.js");
+        </script>
         <script src="js/socket.io.min.js"></script>
         <script type="module" src="js/ui.js"></script>
         <script type="module" src="js/terminal.js"></script>

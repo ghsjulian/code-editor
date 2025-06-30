@@ -6,6 +6,7 @@ const fs = require("fs");
 const cors = require("cors");
 const readDir = require("../functions/read.dir");
 const executeCommand = require("../functions/executor");
+const readFile = require("../functions/read.file");
 
 const app = express();
 const server = http.createServer(app);
@@ -111,13 +112,26 @@ IO.on("connection", async socket => {
             if (cmd) {
                 let fpath = path.join(__dirname, "../../");
                 const result = await executeCommand(`cd ${fpath} && ${cmd}`);
-               console.log(result)
                 IO.to(socket.id).emit("executor-result", result);
             } else {
                 return;
             }
         } catch (error) {
             console.log(`\n[!] Error Executing Commands - ${error}\n`);
+        }
+    });
+    socket.on("get-file-content", async filepath => {
+        try {
+            if (path) {
+                let fpath = path.join(__dirname, "../../", filepath);
+                //let content = await executeCommand(`cat ${fpath}`);
+                let content = await readFile(fpath);
+                IO.to(socket.id).emit("read-file-content", content);
+            } else {
+                return;
+            }
+        } catch (error) {
+            console.log(`\n[!] Error Reading File Content - ${error}\n`);
         }
     });
 
